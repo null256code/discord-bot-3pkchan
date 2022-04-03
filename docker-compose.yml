@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  spkchan-db:
+    image: postgres:13.4
+    container_name: postgresql
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      PGPASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+      TZ: "Asia/Tokyo"
+    hostname: postgres
+    restart: always
+    user: root
+  spkchan-pgadmin:
+    image: dpage/pgadmin4:5.7
+    container_name: pgadmin4
+    ports:
+      - 80:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@example.com
+      PGADMIN_DEFAULT_PASSWORD: postgres
+    hostname: pgadmin4
+    depends_on:
+      - spkchan-db
+    restart: always
