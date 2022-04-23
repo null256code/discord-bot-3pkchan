@@ -123,7 +123,7 @@ jooq {
                         isFluentSetters = true
                     }
                     target.apply {
-                        packageName = "nu.studer.sample"
+                        packageName = "nu.studer.jooq.spkchan"
                         directory = "build/generated-src/jooq/main"  // default (can be omitted)
                     }
                     strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"
