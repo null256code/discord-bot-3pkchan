@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class BotClientConfig(
-    @Value("\${discord.token}")
+    @Value("\${botconfig.discord.token}")
     val token: String
 ) {
     @Bean
