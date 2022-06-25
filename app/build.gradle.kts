@@ -13,15 +13,11 @@ plugins {
 
     id("org.flywaydb.flyway") version Version.flyway
     id("nu.studer.jooq") version "7.1.1"
-}
 
-//buildscript {
-//    configurations["classpath"].resolutionStrategy.eachDependency {
-//        if (requested.group == "org.jooq") {
-//            useVersion(Version.jooq)
-//        }
-//    }
-//}
+    id("com.palantir.docker") version Version.dockerPlugin
+    // id("com.palantir.docker-run") version Version.dockerPlugin
+
+}
 
 configurations {
     compileOnly {
@@ -56,15 +52,20 @@ dependencies {
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+tasks {
+    bootJar {
+        archiveFileName.set("bot3pkchan.jar")
     }
-}
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "11"
+        }
+    }
+    withType<Test> {
+        useJUnitPlatform()
+    }
 }
 
 flyway {
@@ -132,3 +133,19 @@ jooq {
         }
     }
 }
+
+docker {
+    setDockerfile(file("../Dockerfile"))
+    // name = "${rootProject.name}:${version}"
+    name = rootProject.name
+    tasks.bootJar.get().let {
+        dependsOn(it)
+        files(it.archiveFile.get())
+        buildArgs(mapOf("JAR_FILE" to it.archiveFileName.get()))
+    }
+}
+
+//dockerRun {
+//    name = rootProject.name
+//    image = rootProject.name
+//}
