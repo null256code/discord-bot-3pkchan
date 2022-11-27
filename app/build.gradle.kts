@@ -38,11 +38,15 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-jooq")
 
     // -------------------------------------------------------------------
     implementation("com.discord4j:discord4j-core:3.2.3")
+    implementation("com.github.kittinunf.fuel:fuel:${Version.fuel}")
+    implementation("com.github.kittinunf.fuel:fuel-gson:${Version.fuel}")
+    implementation("com.google.code.gson:gson:2.10")
 
     implementation("org.postgresql:postgresql:${Version.postgres}")
     // implementation("org.flywaydb:flyway-core:${Version.flyway")
