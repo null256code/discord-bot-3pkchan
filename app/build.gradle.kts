@@ -42,7 +42,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jooq")
 
     // -------------------------------------------------------------------
-    implementation("com.discord4j:discord4j-core:3.1.3")
+    implementation("com.discord4j:discord4j-core:3.2.3")
 
     implementation("org.postgresql:postgresql:${Version.postgres}")
     // implementation("org.flywaydb:flyway-core:${Version.flyway")
