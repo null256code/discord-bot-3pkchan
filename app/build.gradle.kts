@@ -3,11 +3,11 @@ import org.jooq.meta.jaxb.Logging
 
 group = "nl2co"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 plugins {
     id("org.springframework.boot") version Version.springBoot
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version Version.kotlin
     kotlin("plugin.spring") version Version.kotlin
 
@@ -64,7 +64,7 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "11"
+            jvmTarget = "17"
         }
     }
     withType<Test> {
