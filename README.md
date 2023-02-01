@@ -27,6 +27,15 @@
 
 - `./gradlew bootRun` で動く
 
+### (Windows向け) nativeCompile用環境構築＆実行の仕方
+- [graalvm](https://community.chocolatey.org/packages/graalvm) をインストールする
+- graalvmを `JAVA_HOME` に設定
+- 2019以降のVisualStudioをDLして `C++に夜デスクトップ開発` をインストールする
+  - コマンドラインでビルドするために必要
+  - 2022でも多分いけるはず(2019でしか試していない)
+- インストールされた `x64 Native Tools Command Prompt for VS 2019` を起動
+- プロジェクトルートに移動し `gradlew nativeCompile` 実行
+
 ## deploy先
 
 ### 環境変数
