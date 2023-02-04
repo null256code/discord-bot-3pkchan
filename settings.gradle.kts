@@ -9,3 +9,11 @@
 
 rootProject.name = "discord-bot-3pkchan"
 include("app")
+
+pluginManagement {
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://repo.spring.io/milestone") }
+        maven { url = uri("https://plugins.gradle.org/m2/") }
+    }
+}

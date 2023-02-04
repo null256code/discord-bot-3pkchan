@@ -62,6 +62,11 @@ tasks {
         archiveFileName.set("bot3pkchan.jar")
     }
 
+    bootBuildImage {
+        setProperty("builder", "heroku/builder:22")
+        environment.put("BP_NATIVE_IMAGE", "true")
+    }
+
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
