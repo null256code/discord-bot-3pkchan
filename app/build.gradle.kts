@@ -13,7 +13,7 @@ plugins {
     kotlin("plugin.spring") version Version.kotlin
 
     id("org.flywaydb.flyway") version Version.flyway
-    id("nu.studer.jooq") version "7.1.1"
+    id("nu.studer.jooq") version "8.1"
 
     id("com.palantir.docker") version Version.dockerPlugin
     // id("com.palantir.docker-run") version Version.dockerPlugin
@@ -56,8 +56,15 @@ dependencies {
     // https://github.com/etiennestuder/gradle-jooq-plugin/issues/209
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
 }
-
 tasks {
+    build {
+        mustRunAfter(clean)
+    }
+
+    create("stage") {
+        dependsOn(build, clean)
+    }
+
     bootJar {
         archiveFileName.set("bot3pkchan.jar")
     }
@@ -97,6 +104,9 @@ jooq {
 
     configurations {
         create("main") {  // name of the jOOQ configuration
+            // ビルド時にjOOQの自動生成を行わない。local以外ではjOOQの生成ができる設定にしていないため
+            generateSchemaSourceOnCompilation.set(false)
+
             jooqConfiguration.apply {
                 logging = Logging.WARN
                 jdbc.apply {

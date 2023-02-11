@@ -1,0 +1,1 @@
+web: java -Dserver.port=${PORT:8080} -jar app/build/libs/bot3pkchan.jar
