@@ -5,5 +5,4 @@ object Version {
     const val flyway = "9.8.1"
     const val jooq = " 3.16.5"
     const val postgres = "42.5.1"
-    const val dockerPlugin = "0.34.0"
 }

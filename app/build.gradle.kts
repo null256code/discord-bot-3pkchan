@@ -14,10 +14,6 @@ plugins {
 
     id("org.flywaydb.flyway") version Version.flyway
     id("nu.studer.jooq") version "8.1"
-
-    id("com.palantir.docker") version Version.dockerPlugin
-    // id("com.palantir.docker-run") version Version.dockerPlugin
-
 }
 
 configurations {
@@ -153,19 +149,3 @@ jooq {
         }
     }
 }
-
-docker {
-    setDockerfile(file("../Dockerfile"))
-    // name = "${rootProject.name}:${version}"
-    name = rootProject.name
-    tasks.bootJar.get().let {
-        dependsOn(it)
-        files(it.archiveFile.get())
-        buildArgs(mapOf("JAR_FILE" to it.archiveFileName.get()))
-    }
-}
-
-//dockerRun {
-//    name = rootProject.name
-//    image = rootProject.name
-//}
