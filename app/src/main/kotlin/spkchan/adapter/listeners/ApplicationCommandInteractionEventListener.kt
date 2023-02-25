@@ -13,7 +13,7 @@ class ApplicationCommandInteractionEventListener(
         get() = ApplicationCommandInteractionEvent::class.java
 
     override fun execute(event: ApplicationCommandInteractionEvent): Mono<Void> {
-        return useCases.firstOrNull { it.isCalled(event.interaction.commandInteraction.get())}?.handle(event) ?: Mono.empty()
+        return useCases.firstOrNull { it.isCalled(event.interaction.commandInteraction.get())}?.handle(event)?.then() ?: Mono.empty()
     }
 
 }

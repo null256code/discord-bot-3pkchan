@@ -1,15 +1,11 @@
 package spkchan.application.usecases.cooking
 
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent
-import discord4j.core.`object`.command.ApplicationCommandOption
-import discord4j.core.`object`.entity.Message
-import discord4j.discordjson.json.ApplicationCommandOptionData
 import discord4j.discordjson.json.ApplicationCommandRequest
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import spkchan.application.usecases.ApplicationCommandInteractionUseCase
-import spkchan.application.usecases.MessageCreateUseCase
 import spkchan.external.apis.rakuten.queries.FetchDailyMenuQuery
 
 @Component
@@ -37,7 +33,7 @@ class SearchRecipeUseCase(
 //            )
             .build()
 
-    override fun handle(event: ApplicationCommandInteractionEvent): Mono<Void> {
+    override fun handle(event: ApplicationCommandInteractionEvent): Mono<*> {
         val recipeRanking = fetchDailyMenuQuery.handle().recipes.joinToString("\n\n") {
             """
 ${it.rank}位 ${it.title}
@@ -47,12 +43,16 @@ ${it.recipeUrl}
 """.trimIndent()
         }
 
-        return event.reply(
-            """
+        // 応答に3秒以上かかる場合はdeferReplyを使わないとタイムアウトする
+        // https://docs.discord4j.com/interactions/application-commands#responding-to-commands
+        return event.deferReply().then(
+            event.createFollowup(
+                """
 今日の献立ランキングです
 
 $recipeRanking
             """.trimIndent()
+            )
         )
     }
 }

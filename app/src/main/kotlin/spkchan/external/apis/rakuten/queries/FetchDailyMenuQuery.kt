@@ -24,9 +24,9 @@ class FetchDailyMenuQuery(
                 title = it.recipeTitle,
                 recipeUrl = it.recipeUrl,
                 imageUrl = it.mediumImageUrl,
-                recipeDescription = it.recipeDescription.substring(0..30).let { text ->
+                recipeDescription = it.recipeDescription.let { text ->
                     if (it.recipeDescription.length > 30) {
-                        "$text..."
+                        "${text.substring(0..30)}..."
                     } else {
                         text
                     }

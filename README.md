@@ -17,10 +17,11 @@
 - Springの `@Value`で以下を設定しているので、実行時の環境変数などにそれぞれ設定しておく
 
 
-| 変数名                           | 必須 | 説明                                                              |
-| -------------------------------- | ---- | ----------------------------------------------------------------- |
-| botconfig.discord.token          | ○   | Discord BotのTOKEN                                                |
-| botconfig.discord.application_id | ○   | Discord BotのAPPLICATION ID                                       |
+| 変数名                              | 必須 | 説明                                                   |
+|----------------------------------| ---- |------------------------------------------------------|
+| botconfig.discord.token          | ○   | Discord BotのTOKEN                                    |
+| botconfig.discord.application_id | ○   | Discord BotのAPPLICATION ID                           |
+| botconfig.discord.server_id      | ○   | Discord BotのGUILD ID(サーバーID)、slash commandの登録に使用     |
 | botconfig.rakuten.application_id | ○   | [楽天ウェブサービス](https://webservice.rakuten.co.jp/)のアプリID |
 
 ### 実行

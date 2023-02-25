@@ -12,7 +12,8 @@ import spkchan.application.usecases.ApplicationCommandInteractionUseCase
 @Configuration
 class BotClientConfig(
     @Value("\${botconfig.discord.token}") val token: String,
-    @Value("\${botconfig.discord.application_id}") val applicationId: Long
+    @Value("\${botconfig.discord.application_id}") val applicationId: Long,
+    @Value("\${botconfig.discord.server_id}") val serverId: Long
 ) {
     @Bean
     fun <T : Event> gatewayDiscordClient(
@@ -31,18 +32,21 @@ class BotClientConfig(
         client.restClient.applicationService.run {
             // コマンドの更新・登録
             commandUseCases.map { it.commandName to it.commandRequest }.forEach { (name, request) ->
-                getGlobalApplicationCommands(applicationId).subscribe {
+                var isModified = false
+                getGuildApplicationCommands(applicationId, serverId).subscribe {
                     if (it.name() == name) {
-                        modifyGlobalApplicationCommand(applicationId, it.id().asLong(), request).subscribe()
-                    } else {
-                        createGlobalApplicationCommand(applicationId, request).subscribe()
+                        modifyGuildApplicationCommand(applicationId, serverId, it.id().asLong(), request).subscribe()
+                        isModified = true
                     }
+                }
+                if (!isModified) {
+                    createGuildApplicationCommand(applicationId, serverId, request).subscribe()
                 }
             }
             // コマンドの削除
-            getGlobalApplicationCommands(applicationId)
+            getGuildApplicationCommands(applicationId, serverId)
                 .filter { commandUseCases.all { uc -> uc.commandName != it.name() } }
-                .subscribe { deleteGlobalApplicationCommand(applicationId, it.id().asLong()).subscribe() }
+                .subscribe { deleteGuildApplicationCommand(applicationId, serverId, it.id().asLong()).subscribe() }
         }
 
         return client
