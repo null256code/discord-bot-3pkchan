@@ -11,5 +11,4 @@ interface ApplicationCommandInteractionUseCase {
     val commandRequest: ImmutableApplicationCommandRequest
     fun isCalled(command: ApplicationCommandInteraction): Boolean = command.name.get() == commandName
     fun handle(event: ApplicationCommandInteractionEvent): Mono<*>
-
 }

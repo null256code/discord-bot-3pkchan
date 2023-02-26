@@ -7,13 +7,12 @@ import spkchan.application.usecases.ApplicationCommandInteractionUseCase
 
 @Service
 class ApplicationCommandInteractionEventListener(
-        private val useCases: List<ApplicationCommandInteractionUseCase>
+    private val useCases: List<ApplicationCommandInteractionUseCase>,
 ) : EventListener<ApplicationCommandInteractionEvent> {
     override val eventType: Class<ApplicationCommandInteractionEvent>
         get() = ApplicationCommandInteractionEvent::class.java
 
     override fun execute(event: ApplicationCommandInteractionEvent): Mono<Void> {
-        return useCases.firstOrNull { it.isCalled(event.interaction.commandInteraction.get())}?.handle(event)?.then() ?: Mono.empty()
+        return useCases.firstOrNull { it.isCalled(event.interaction.commandInteraction.get()) }?.handle(event)?.then() ?: Mono.empty()
     }
-
 }

@@ -14,6 +14,7 @@ plugins {
 
     id("org.flywaydb.flyway") version Version.flyway
     id("nu.studer.jooq") version "8.1"
+    id("com.diffplug.spotless") version "6.15.0"
 }
 
 configurations {
@@ -147,5 +148,20 @@ jooq {
                 }
             }
         }
+    }
+}
+
+spotless {
+    // ratchetFrom = "origin/main"
+    format("misc") {
+        target("*.gradle","*.md",".gitignore")
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    kotlin {
+        ktlint("0.48.2")
+            .setUseExperimental(true)
+            // .setEditorConfigPath("$projectDir/config/.editorconfig")
     }
 }

@@ -3,7 +3,14 @@ package spkchan.external.apis.rakuten
 import com.github.kittinunf.fuel.gson.gsonDeserializer
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
-import com.google.gson.*
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CacheEvict
@@ -18,7 +25,7 @@ typealias Endpoint = String
 
 @Component
 class RakutenRecipeApiClient(
-    @Value("\${botconfig.rakuten.application_id}") val applicationId: String
+    @Value("\${botconfig.rakuten.application_id}") val applicationId: String,
 ) {
     companion object {
         private const val ENDPOINT: Endpoint = "https://app.rakuten.co.jp/services/api/Recipe/CategoryRanking/20170426"
@@ -62,7 +69,7 @@ class RakutenRecipeApiClient(
 // https://webservice.rakuten.co.jp/documentation/recipe-category-ranking
 data class RakutenRecipeCategoryRankingResponse(
     var result: List<RankingRecipe>,
-    @Transient var fetchedDateTime: LocalDateTime
+    @Transient var fetchedDateTime: LocalDateTime,
 ) {
     data class RankingRecipe(
         var recipeId: Long,
@@ -79,7 +86,7 @@ data class RakutenRecipeCategoryRankingResponse(
         var recipeIndication: String,
         var recipeCost: String,
         // var recipePublishday: String,
-        var rank: String
+        var rank: String,
     )
 }
 
@@ -100,7 +107,6 @@ class GsonDeserializer : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDa
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime =
         LocalDateTime.parse(
             json.asString,
-            DateTimeFormatter.ofPattern("uuuu/MM/dd HH::mm::ss").withLocale(Locale.JAPAN)
-        );
-
+            DateTimeFormatter.ofPattern("uuuu/MM/dd HH::mm::ss").withLocale(Locale.JAPAN),
+        )
 }

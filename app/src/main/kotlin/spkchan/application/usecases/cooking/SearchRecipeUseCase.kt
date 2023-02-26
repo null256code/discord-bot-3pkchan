@@ -10,7 +10,7 @@ import spkchan.external.apis.rakuten.queries.FetchDailyMenuQuery
 
 @Component
 class SearchRecipeUseCase(
-    private val fetchDailyMenuQuery: FetchDailyMenuQuery
+    private val fetchDailyMenuQuery: FetchDailyMenuQuery,
 ) : ApplicationCommandInteractionUseCase {
 
     companion object {
@@ -40,7 +40,7 @@ ${it.rank}位 ${it.title}
 【材料】${it.ingredientsDescription.replace(Regex("[\r\n]]"), " ")}
 【説明】${it.recipeDescription}
 ${it.recipeUrl}
-""".trimIndent()
+            """.trimIndent()
         }
 
         // 応答に3秒以上かかる場合はdeferReplyを使わないとタイムアウトする
@@ -51,8 +51,8 @@ ${it.recipeUrl}
 今日の献立ランキングです
 
 $recipeRanking
-            """.trimIndent()
-            )
+                """.trimIndent(),
+            ),
         )
     }
 }

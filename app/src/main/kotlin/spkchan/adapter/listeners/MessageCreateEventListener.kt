@@ -7,7 +7,7 @@ import spkchan.application.usecases.MessageCreateUseCase
 
 @Service
 class MessageCreateEventListener(
-        private val useCases: List<MessageCreateUseCase>
+    private val useCases: List<MessageCreateUseCase>,
 ) : EventListener<MessageCreateEvent> {
 
     override val eventType: Class<MessageCreateEvent> get() = MessageCreateEvent::class.java

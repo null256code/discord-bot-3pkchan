@@ -10,13 +10,13 @@ interface RakutenRecipeCategoryParameter {
 class RakutenRecipeCategory(
     override val categoryName: String,
     override val categoryId: Int,
-    override val parent: RakutenRecipeCategory?
+    override val parent: RakutenRecipeCategory?,
 ) : RakutenRecipeCategoryParameter {
 
     enum class CategoryL(
         override val categoryName: String,
         override val categoryId: Int,
-        override val parent: RakutenRecipeCategory? = null
+        override val parent: RakutenRecipeCategory? = null,
     ) : RakutenRecipeCategoryParameter {
         POPULAR("人気メニュー", 30),
         REGULAR_MEAT("定番の肉料理", 31),

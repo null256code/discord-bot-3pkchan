@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 @Component
 class FetchDailyMenuQuery(
-    private val rakutenRecipeApiClient: RakutenRecipeApiClient
+    private val rakutenRecipeApiClient: RakutenRecipeApiClient,
 ) {
     fun handle(): FindDailyMenuQueryResult {
         val param = listOf(RakutenRecipeCategory.CategoryL.DAILY_MENU)
@@ -32,14 +32,14 @@ class FetchDailyMenuQuery(
                     }
                 },
                 ingredientsDescription = it.recipeMaterial.joinToString(", "),
-                rank = kotlin.runCatching { it.rank.toInt() }.getOrDefault(0)
+                rank = kotlin.runCatching { it.rank.toInt() }.getOrDefault(0),
             )
         }.let { FindDailyMenuQueryResult(it) }
     }
 }
 
 data class FindDailyMenuQueryResult(
-    val recipes: List<Recipe>
+    val recipes: List<Recipe>,
 ) {
     data class Recipe(
         val title: String,

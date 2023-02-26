@@ -13,12 +13,12 @@ import spkchan.application.usecases.ApplicationCommandInteractionUseCase
 class BotClientConfig(
     @Value("\${botconfig.discord.token}") val token: String,
     @Value("\${botconfig.discord.application_id}") val applicationId: Long,
-    @Value("\${botconfig.discord.server_id}") val serverId: Long
+    @Value("\${botconfig.discord.server_id}") val serverId: Long,
 ) {
     @Bean
     fun <T : Event> gatewayDiscordClient(
         eventListeners: List<EventListener<T>>,
-        commandUseCases: List<ApplicationCommandInteractionUseCase>
+        commandUseCases: List<ApplicationCommandInteractionUseCase>,
     ): GatewayDiscordClient {
         val client = DiscordClientBuilder.create(token).build().login().block()!!
 
