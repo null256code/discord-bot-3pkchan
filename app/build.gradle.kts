@@ -1,3 +1,4 @@
+import com.diffplug.gradle.spotless.SpotlessExtension
 import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 
@@ -68,7 +69,7 @@ tasks {
 
     bootBuildImage {
         setProperty("builder", "heroku/builder:22")
-        environment.put("BP_NATIVE_IMAGE", "true")
+        environment["BP_NATIVE_IMAGE"] = "true"
     }
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -158,10 +159,20 @@ spotless {
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
+        lineEndings = com.diffplug.spotless.LineEnding.UNIX
     }
     kotlin {
+        lineEndings = com.diffplug.spotless.LineEnding.UNIX
         ktlint("0.48.2")
             .setUseExperimental(true)
             // .setEditorConfigPath("$projectDir/config/.editorconfig")
+    }
+}
+
+// https://github.com/diffplug/spotless/issues/752
+// https://devcenter.heroku.com/articles/buildpack-api#stacks
+if (System.getenv().containsKey("STACK")) {
+    afterEvaluate {
+        project.extensions.findByType(SpotlessExtension::class.java)?.ratchetFrom(null)
     }
 }
