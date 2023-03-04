@@ -3,3 +3,5 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
+# https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#appendix.application-properties.json

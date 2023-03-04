@@ -43,8 +43,6 @@ dependencies {
 
     // -------------------------------------------------------------------
     implementation("com.discord4j:discord4j-core:3.2.3")
-    implementation("com.github.kittinunf.fuel:fuel:${Version.fuel}")
-    implementation("com.github.kittinunf.fuel:fuel-gson:${Version.fuel}")
     implementation("com.google.code.gson:gson:2.10")
 
     implementation("org.postgresql:postgresql:${Version.postgres}")

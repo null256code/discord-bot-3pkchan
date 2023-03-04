@@ -1,24 +1,13 @@
 package spkchan.external.apis.rakuten
 
-import com.github.kittinunf.fuel.gson.gsonDeserializer
-import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.result.Result
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import java.lang.reflect.Type
+import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 typealias Endpoint = String
@@ -26,6 +15,7 @@ typealias Endpoint = String
 @Component
 class RakutenRecipeApiClient(
     @Value("\${botconfig.rakuten.application_id}") val applicationId: String,
+    val restTemplate: RestTemplate,
 ) {
     companion object {
         private const val ENDPOINT: Endpoint = "https://app.rakuten.co.jp/services/api/Recipe/CategoryRanking/20170426"
@@ -42,19 +32,29 @@ class RakutenRecipeApiClient(
     )
     fun fetchCategoryRanking(categories: List<RakutenRecipeCategoryParameter>): RakutenRecipeCategoryRankingResponse? {
         logger.info("fetchCategoryRanking() is called.")
-        val (_, _, result) = ENDPOINT.setup(categories.map { it.categoryId })
-            .httpGet()
-            .responseObject<RakutenRecipeCategoryRankingResponse>(gsonDeserializer())
 
-        return when (result) {
-            is Result.Failure -> {
+        val result = kotlin.runCatching {
+            restTemplate.getForEntity(
+                ENDPOINT.setup(categories.map { it.categoryId }),
+                RakutenRecipeCategoryRankingResponse::class.java,
+            )
+        }
+
+        return when {
+            result.isSuccess -> {
+                logger.info("fetchCategoryRanking() is finished.")
+                result.map {
+                    if (it.statusCode != HttpStatus.OK) {
+                        null
+                    } else {
+                        it.body?.apply { fetchedDateTime = LocalDateTime.now() }
+                    }
+                }.getOrNull()
+            }
+            else -> {
                 logger.warn("fetchCategoryRanking() is failed.")
                 logger.warn(result.toString())
                 null // TODO: Responseの結果型を作るべき
-            }
-            is Result.Success -> {
-                logger.info("fetchCategoryRanking() is finished.")
-                result.value.apply { fetchedDateTime = LocalDateTime.now() }
             }
         }
     }
@@ -88,25 +88,4 @@ data class RakutenRecipeCategoryRankingResponse(
         // var recipePublishday: String,
         var rank: String,
     )
-}
-
-class GsonDeserializer : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
-
-    companion object {
-        private val dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH::mm::ss")
-
-        fun create(): Gson = GsonBuilder()
-            .registerTypeAdapter(LocalDateTime::class.java, GsonDeserializer)
-            .setPrettyPrinting()
-            .create()
-    }
-
-    override fun serialize(src: LocalDateTime, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
-        JsonPrimitive(dateTimeFormatter.format(src))
-
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): LocalDateTime =
-        LocalDateTime.parse(
-            json.asString,
-            DateTimeFormatter.ofPattern("uuuu/MM/dd HH::mm::ss").withLocale(Locale.JAPAN),
-        )
 }
