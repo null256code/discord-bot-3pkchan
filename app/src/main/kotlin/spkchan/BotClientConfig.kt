@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import spkchan.adapter.listeners.EventListener
-import spkchan.application.usecases.ApplicationCommandInteractionUseCase
+import spkchan.adapter.listeners.MainCommand
 
 @Configuration
 class BotClientConfig(
@@ -23,7 +23,6 @@ class BotClientConfig(
     @Bean
     fun <T : Event> gatewayDiscordClient(
         eventListeners: List<EventListener<T>>,
-        commandUseCases: List<ApplicationCommandInteractionUseCase>,
     ): GatewayDiscordClient {
         val client = DiscordClientBuilder.create(token).build().login().block()!!
 
@@ -56,7 +55,7 @@ class BotClientConfig(
                 )
             }.run {
                 // コマンドの更新・登録
-                commandUseCases.map { it.commandName to it.commandRequest }.forEach { (name, request) ->
+                MainCommand.values().map { it.name to it.command }.forEach { (name, request) ->
                     var isModified = false
                     findCommandsAction().subscribe {
                         if (it.name() == name) {
@@ -70,7 +69,7 @@ class BotClientConfig(
                 }
                 // コマンドの削除
                 findCommandsAction()
-                    .filter { commandUseCases.all { uc -> uc.commandName != it.name() } }
+                    .filter { MainCommand.values().all { mc -> mc.name != it.name() } }
                     .subscribe { deleteAction(it.id().asLong()).subscribe() }
             }
         }

@@ -48,17 +48,20 @@ dependencies {
     implementation("org.postgresql:postgresql:${Version.postgres}")
     // implementation("org.flywaydb:flyway-core:${Version.flyway")
 
+    implementation("com.github.scribejava:scribejava-core:8.3.3")
+
     jooqGenerator("org.postgresql:postgresql:${Version.postgres}")
     // https://github.com/etiennestuder/gradle-jooq-plugin/issues/209
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
 }
+
 tasks {
     build {
         mustRunAfter(clean)
     }
 
     create("stage") {
-        dependsOn(build, clean)
+        dependsOn(clean, flywayMigrate, build)
     }
 
     bootJar {
@@ -88,10 +91,7 @@ flyway {
     password = "postgres"
     encoding = "UTF-8"
     schemas = arrayOf("public")
-//    placeholders = mapOf(
-//        "keyABC" to "valueXYZ",
-//        "otherplaceholder" to "value123"
-//    )
+    cleanDisabled = false
 }
 
 // https://github.com/etiennestuder/gradle-jooq-plugin#gradle-kotlin-dsl-4
@@ -100,16 +100,15 @@ jooq {
 
     configurations {
         create("main") {  // name of the jOOQ configuration
-            // ビルド時にjOOQの自動生成を行わない。local以外ではjOOQの生成ができる設定にしていないため
-            generateSchemaSourceOnCompilation.set(false)
+            generateSchemaSourceOnCompilation.set(true)
 
             jooqConfiguration.apply {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://localhost:5432/postgres"
-                    user = "postgres"
-                    password = "postgres"
+                    url = Environments.DataSource.url
+                    user = Environments.DataSource.username
+                    password = Environments.DataSource.password
 //                    properties.add(Property().apply {
 //                        key = "ssl"
 //                        value = "true"
@@ -132,6 +131,7 @@ jooq {
                                 includeTypes = "INET"
                             }
                         ))
+                        excludes = "flyway_schema_history"
                     }
                     generate.apply {
                         isDeprecated = false
@@ -153,7 +153,7 @@ jooq {
 spotless {
     // ratchetFrom = "origin/main"
     format("misc") {
-        target("*.gradle","*.md",".gitignore")
+        target("*.gradle", "*.md", ".gitignore")
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
@@ -163,7 +163,7 @@ spotless {
         lineEndings = com.diffplug.spotless.LineEnding.UNIX
         ktlint("0.48.2")
             .setUseExperimental(true)
-            // .setEditorConfigPath("$projectDir/config/.editorconfig")
+        // .setEditorConfigPath("$projectDir/config/.editorconfig")
     }
 }
 

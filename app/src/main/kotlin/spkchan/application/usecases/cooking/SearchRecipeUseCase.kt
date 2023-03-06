@@ -3,10 +3,9 @@ package spkchan.application.usecases.cooking
 import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent
 import discord4j.core.`object`.component.ActionRow
 import discord4j.core.`object`.component.Button
-import discord4j.discordjson.json.ApplicationCommandRequest
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
+import spkchan.adapter.listeners.MainCommand
 import spkchan.application.usecases.ApplicationCommandInteractionUseCase
 import spkchan.external.apis.rakuten.queries.FetchDailyMenuQuery
 
@@ -14,26 +13,7 @@ import spkchan.external.apis.rakuten.queries.FetchDailyMenuQuery
 class SearchRecipeUseCase(
     private val fetchDailyMenuQuery: FetchDailyMenuQuery,
 ) : ApplicationCommandInteractionUseCase {
-
-    companion object {
-        private const val IDENTIFIER = "3cook"
-    }
-
-    override val commandName = IDENTIFIER
-
-    override val commandRequest: ImmutableApplicationCommandRequest
-        get() = ApplicationCommandRequest.builder()
-            .name(commandName)
-            .description("higawari oryouri oshiete kureru.")
-//            .addOption(
-//                ApplicationCommandOptionData.builder()
-//                    .name("digits")
-//                    .description("Number of digits (1-20)")
-//                    .type(ApplicationCommandOption.Type.INTEGER.value)
-//                    .required(false)
-//                    .build()
-//            )
-            .build()
+    override val mainCommand = MainCommand.Cook
 
     override fun handle(event: ApplicationCommandInteractionEvent): Mono<*> {
         val recipes = fetchDailyMenuQuery.handle().recipes
