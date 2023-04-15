@@ -20,11 +20,12 @@ CREATE TABLE IF NOT EXISTS request_authentication_oauth1a (
     account_id bigint not null references account(account_id),
     service_name varchar(32) not null,
     request_authentication_time timestamp not null,
-    oauth_request_token varchar(256) not null
+    request_token varchar(256) not null,
+    request_token_secret varchar(256) not null
 );
 
 CREATE TABLE IF NOT EXISTS account_token_oauth1a (
-    account_connected_service_id bigint primary key,
-    oauth_token varchar(256) not null,
-    oauth_token_secret varchar(256) not null
+    account_connected_service_id bigint primary key references account_connected_service(account_connected_service_id),
+    access_token varchar(256) not null,
+    access_token_secret varchar(256) not null
 );

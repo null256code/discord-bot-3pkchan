@@ -69,8 +69,7 @@ class BotClientConfig(
                 }
                 // コマンドの削除
                 findCommandsAction()
-                    // .filter { MainCommand.values().all { mc -> mc.name != it.name() } }
-                    .filter { it.name() == MainCommand.Cook.name }
+                    .filter { MainCommand.values().all { mc -> mc.name != it.name() } }
                     .subscribe { deleteAction(it.id().asLong()).subscribe() }
             }
         }

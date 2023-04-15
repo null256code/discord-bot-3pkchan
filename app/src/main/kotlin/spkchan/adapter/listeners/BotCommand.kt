@@ -22,22 +22,31 @@ sealed class MainCommand(val name: String) {
         override val subCommands = emptyList<SubCommand>()
         override val command = ApplicationCommandRequest.builder()
             .name(name)
-            .description("higawari oryouri oshiete kureru.")
+            .description("日替わりのレシピランキングを取得します")
             .build()
     }
 
     object Kakeibo : MainCommand("3kakeibo") {
-        override val subCommands = listOf(SignUp)
+        override val subCommands = listOf(SignIn, VerifyUser)
         override val command = ApplicationCommandRequest.builder()
             .name(name)
             .description("zaim de iroiro dekiru.")
             .addAllOptions(subCommands.map { it.option })
             .build()
 
-        object SignUp : SubCommand("signup") {
+        object SignIn : SubCommand("signin") {
             override val option = ApplicationCommandOptionData.builder()
                 .name(name)
                 .description("ZaimとDiscordのアカウントを紐づけます。他の機能を使う前に行う必要があります。")
+                .type(ApplicationCommandOption.Type.SUB_COMMAND.value)
+                .required(false)
+                .build()
+        }
+
+        object VerifyUser : SubCommand("verify") {
+            override val option = ApplicationCommandOptionData.builder()
+                .name(name)
+                .description("Zaimと認証できているかをチェックします。")
                 .type(ApplicationCommandOption.Type.SUB_COMMAND.value)
                 .required(false)
                 .build()

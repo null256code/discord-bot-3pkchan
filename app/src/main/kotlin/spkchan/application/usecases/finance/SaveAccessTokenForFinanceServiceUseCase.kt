@@ -1,29 +1,44 @@
 package spkchan.application.usecases.finance
 
-import org.springframework.http.HttpStatus
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent
+import discord4j.core.`object`.component.TextInput
 import org.springframework.stereotype.Component
-import spkchan.application.usecases.WebRequestUseCase
+import reactor.core.publisher.Mono
+import spkchan.adapter.listeners.BotModal
+import spkchan.application.usecases.ModalSubmitInteractionUseCase
+import spkchan.domain.models.ExternalService
+import spkchan.domain.models.UnsavedAuthenticatedService
 import spkchan.external.apis.zaim.ZaimApiClient
+import spkchan.persistence.repositories.AccountRepository
+import spkchan.persistence.repositories.ConnectedServiceRepository
 
 @Component
 class SaveAccessTokenForFinanceServiceUseCase(
     private val zaimApiClient: ZaimApiClient,
-) : WebRequestUseCase<SaveAccessTokenForFinanceServiceUseCase.Request, SaveAccessTokenForFinanceServiceUseCase.Response> {
+    private val accountRepository: AccountRepository,
+    private val connectedServiceRepository: ConnectedServiceRepository,
+) : ModalSubmitInteractionUseCase {
 
-    override fun handle(request: Request): Response {
-        // tokenとsecret 取得
-        // val tokenResult = zaimApiClient.getAuthenticationToken(request.oauthToken, request.oauthVerifier)
+    override val modal = BotModal.TOKEN_INPUT_MODAL
 
-        // TODO: pre authを検索してuserを確定させる
-        // TODO: DBに保存、token と accountを紐づける
+    override fun handle(event: ModalSubmitInteractionEvent): Mono<*> {
+        val oauthVerifierInput = event.getComponents(TextInput::class.java)
+            .firstOrNull { it.customId == BotModal.TOKEN_INPUT_MODAL.textInputId }
+            ?: return event.reply("入力されたフォームを検知できませんでした")
 
-        // TODO: Discordのwebhookを叩いてチャット飛ばす
-        TODO("Not yet implemented")
+        val discordMember = event.interaction.member.get()
+        val account = accountRepository.findAccount(discordMember.id.asLong())
+            ?: return event.reply("アカウントが見つかりません")
+        val requestToken = connectedServiceRepository.findRequestToken(account, ExternalService.Zaim)
+            ?: return event.reply("保存された認証が見つかりません。もう一度signupを実行すると解決するかもしれません")
+
+        if (oauthVerifierInput.value.isEmpty) {
+            return event.reply("フォームの値が空です")
+        }
+        val accessToken = zaimApiClient.fetchAccessToken(requestToken, oauthVerifierInput.value.get())
+        val service = UnsavedAuthenticatedService(ExternalService.Zaim, accessToken)
+        connectedServiceRepository.saveAccessToken(account, service)
+
+        return event.reply("トークンの保存完了しました")
     }
-
-    data class Request(
-        val oauthToken: String,
-        val oauthVerifier: String,
-    ) : WebRequestUseCase.Request
-    data class Response(override val status: HttpStatus) : WebRequestUseCase.Response
 }

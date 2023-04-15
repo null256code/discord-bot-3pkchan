@@ -11,7 +11,7 @@ import spkchan.domain.models.UnsavedDiscordAccount
 class AccountRepository(
     private val dslContext: DSLContext,
 ) {
-    fun fetchAccount(id: Long): DiscordAccount? {
+    fun findAccount(id: Long): DiscordAccount? {
         return dslContext
             .select(
                 ACCOUNT.ACCOUNT_ID,
@@ -20,7 +20,7 @@ class AccountRepository(
                 DISCORD_ACCOUNT.DISCRIMINATOR,
             )
             .from(ACCOUNT)
-            .join(DISCORD_ACCOUNT).on(DISCORD_ACCOUNT.ACCOUNT_ID.eq(ACCOUNT.ACCOUNT_ID))
+            .join(DISCORD_ACCOUNT).using(ACCOUNT.ACCOUNT_ID)
             .where(DISCORD_ACCOUNT.DISCORD_ACCOUNT_ID.eq(id))
             .fetchOne {
                 DiscordAccount(it.value1(), it.value2(), it.value3(), it.value4())

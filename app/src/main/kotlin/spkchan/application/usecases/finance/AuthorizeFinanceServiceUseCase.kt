@@ -5,8 +5,10 @@ import discord4j.core.`object`.component.ActionRow
 import discord4j.core.`object`.component.Button
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
+import spkchan.adapter.listeners.BotButton
 import spkchan.adapter.listeners.MainCommand
 import spkchan.application.usecases.ApplicationCommandInteractionUseCase
+import spkchan.domain.models.ExternalService
 import spkchan.domain.models.UnsavedDiscordAccount
 import spkchan.external.apis.zaim.ZaimApiClient
 import spkchan.persistence.repositories.AccountRepository
@@ -20,25 +22,25 @@ class AuthorizeFinanceServiceUseCase(
 ) : ApplicationCommandInteractionUseCase {
 
     override val mainCommand = MainCommand.Kakeibo
-    override val subCommand = MainCommand.Kakeibo.SignUp
+    override val subCommand = MainCommand.Kakeibo.SignIn
 
     override fun handle(event: ApplicationCommandInteractionEvent): Mono<*> {
-        val requestToken = zaimApiClient.fetchRequestToken()
-
         val discordMember = event.interaction.member.get()
-        val fetchedAccount = accountRepository.fetchAccount(discordMember.id.asLong())
+        val fetchedAccount = accountRepository.findAccount(discordMember.id.asLong())
         val discordAccount = fetchedAccount ?: discordMember.run {
             val unsavedAccount = UnsavedDiscordAccount(id.asLong(), username, discriminator)
             accountRepository.saveAccount(unsavedAccount)
         }
 
-        connectedServiceRepository.saveRequestToken(discordAccount, "zaim", requestToken.tokenSecret)
-
-        val url = zaimApiClient.generateAuthorizationUrl(requestToken)
-        return if (false) {
-            // TODO: 既に認証済みのパターンも考慮に入れる
-            event.reply("以下のリンクからZaimのアカウント認証を行ってください。")
+        val hasToken = connectedServiceRepository.findConnectedServices(discordAccount).any {
+            it.serviceType == ExternalService.Zaim
+        }
+        return if (hasToken) {
+            event.reply("既に認証済みです")
         } else {
+            val requestToken = zaimApiClient.fetchRequestToken()
+            connectedServiceRepository.saveRequestToken(discordAccount, ExternalService.Zaim, requestToken)
+            val url = zaimApiClient.generateAuthorizationUrl(requestToken)
             event
                 .reply(
                     """
@@ -49,7 +51,7 @@ class AuthorizeFinanceServiceUseCase(
                 )
                 .withComponents(
                     ActionRow.of(Button.link(url, "Zaimアカウント認証")),
-                    ActionRow.of(Button.primary("XXX_TODO_REGISTER_BUTTON_XXX", "トークンを登録")),
+                    ActionRow.of(Button.primary(BotButton.CREATE_TOKEN_INPUT_MODAL_BUTTON.name, "トークンを登録")),
                 )
         }
     }

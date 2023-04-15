@@ -1,5 +1,8 @@
 package spkchan
 
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -23,4 +26,9 @@ class AppConfig {
     fun restTemplate(): RestTemplate = RestTemplateBuilder()
         .messageConverters(GsonHttpMessageConverter())
         .build()
+
+    @Bean
+    fun gson(): Gson = GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create()
 }
