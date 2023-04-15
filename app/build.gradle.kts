@@ -58,6 +58,7 @@ dependencies {
 tasks {
     build {
         mustRunAfter(clean)
+        mustRunAfter(flywayMigrate)
     }
 
     create("stage") {
@@ -86,12 +87,12 @@ tasks {
 
 flyway {
     driver = "org.postgresql.Driver"
-    url = "jdbc:postgresql://localhost:5432/postgres"
-    user = "postgres"
-    password = "postgres"
+    url = Environments.DataSource.url
+    user = Environments.DataSource.username
+    password = Environments.DataSource.password
     encoding = "UTF-8"
     schemas = arrayOf("public")
-    cleanDisabled = false
+    cleanDisabled = Environments.DataSource.isLocal.not()
 }
 
 // https://github.com/etiennestuder/gradle-jooq-plugin#gradle-kotlin-dsl-4
