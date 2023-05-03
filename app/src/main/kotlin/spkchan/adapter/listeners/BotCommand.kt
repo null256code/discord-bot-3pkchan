@@ -6,12 +6,15 @@ import discord4j.discordjson.json.ApplicationCommandRequest
 import discord4j.discordjson.json.ImmutableApplicationCommandOptionData
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest
 
+private inline fun <reified T : MainCommand> T.subCommandOptions() = T::class.nestedClasses
+    .map { it.objectInstance!! as SubCommand }
+    .map { it.option }
+
 sealed class SubCommand(val name: String) {
     abstract val option: ImmutableApplicationCommandOptionData
 }
 
 sealed class MainCommand(val name: String) {
-    abstract val subCommands: List<SubCommand>
     abstract val command: ImmutableApplicationCommandRequest
 
     companion object {
@@ -19,7 +22,6 @@ sealed class MainCommand(val name: String) {
     }
 
     object Cook : MainCommand("3cook") {
-        override val subCommands = emptyList<SubCommand>()
         override val command = ApplicationCommandRequest.builder()
             .name(name)
             .description("日替わりのレシピランキングを取得します")
@@ -27,11 +29,10 @@ sealed class MainCommand(val name: String) {
     }
 
     object Kakeibo : MainCommand("3kakeibo") {
-        override val subCommands = listOf(SignIn, VerifyUser)
         override val command = ApplicationCommandRequest.builder()
             .name(name)
             .description("zaim de iroiro dekiru.")
-            .addAllOptions(subCommands.map { it.option })
+            .addAllOptions(subCommandOptions())
             .build()
 
         object SignIn : SubCommand("signin") {
