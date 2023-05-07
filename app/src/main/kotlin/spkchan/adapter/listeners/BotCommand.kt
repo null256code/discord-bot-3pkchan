@@ -52,5 +52,14 @@ sealed class MainCommand(val name: String) {
                 .required(false)
                 .build()
         }
+
+        object Report : SubCommand("report") {
+            override val option = ApplicationCommandOptionData.builder()
+                .name(name)
+                .description("一週間の収支をレポートします")
+                .type(ApplicationCommandOption.Type.SUB_COMMAND.value)
+                .required(false)
+                .build()
+        }
     }
 }

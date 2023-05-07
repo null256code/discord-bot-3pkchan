@@ -2,7 +2,8 @@ package spkchan.domain.models.finance
 
 import java.time.LocalDateTime
 
-inline fun <reified T : PaymentCategory> T.subGenres() = T::class.nestedClasses.map { it.objectInstance!! }
+inline fun <reified T : PaymentCategory> T.subGenres() = T::class.nestedClasses.map { it.objectInstance!! as PaymentSubGenre }
+fun List<PaymentSubGenre>.valueOf(id: Long) = first { it.id == id }
 
 class Payment(
     recordId: Long,
@@ -20,10 +21,11 @@ class Payment(
     comment,
 )
 
-sealed class PaymentSubGenre(val id: Int)
-sealed class PaymentCategory(val id: Int) {
+sealed class PaymentSubGenre(val id: Long)
+sealed class PaymentCategory(val id: Long) {
     companion object {
         fun values() = PaymentCategory::class.sealedSubclasses.map { it.objectInstance!! }
+        fun valueOf(id: Long) = values().first { it.id == id }
     }
     object Food : PaymentCategory(101) {
         object Groceries : PaymentSubGenre(10101)
