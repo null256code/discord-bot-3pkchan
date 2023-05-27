@@ -23,12 +23,15 @@
 | botconfig.discord.application_id | ○   | Discord BotのAPPLICATION ID                           |
 | botconfig.discord.server_id      | ○   | Discord BotのGUILD ID(サーバーID)、slash commandの登録に使用     |
 | botconfig.rakuten.application_id | ○   | [楽天ウェブサービス](https://webservice.rakuten.co.jp/)のアプリID |
+| botconfig.zaim.oauth.consumer_key | ○   | [Zaim developers](https://dev.zaim.net/)のコンシューマ ID     |
+| botconfig.zaim.oauth.consumer_secret | ○   | [Zaim developers](https://dev.zaim.net/)のコンシューマシークレット |
+
 
 ### 実行
 
 - `./gradlew bootRun` で動く
 
-### (Windows向け) nativeCompile用環境構築＆実行の仕方
+### (Windows向け) nativeCompileを試したいとき
 - [graalvm](https://community.chocolatey.org/packages/graalvm) をインストールする
 - graalvmを `JAVA_HOME` に設定
 - 2019以降のVisualStudioをDLして `C++に夜デスクトップ開発` をインストールする
@@ -41,14 +44,13 @@
 
 ### 環境変数
 
-- localで設定したものに加えて、SPRING_DATASOURCE_XXXを設定する
-  - 詳しくはapplication.yml見て
+- 基本的にはlocalで設定したものを設定する
+  - 追加でSPRING_DATASOURCE_XXXを設定する
+    - 詳しくはapplication.yml見て
+  - `botconfig.discord.server_id` はデプロイ環境では不要(GuildCommandとしてはslash commandを登録しないので)
 
 # デプロイ
 
 ## herokuの場合
 
-- `./gradlew docker` でイメージ作る
-- `heroku container:login`
-- `heroku container:push web`
-- `heroku container:release web`
+- [普通のherokuのdeploy](https://devcenter.heroku.com/ja/articles/deploying-java)をすればOK
